@@ -1,1 +1,1 @@
-EXEC SF_Replicate 'CFG_NMSS_QA','InterestedCase__c','pkchunk,batchsize(50000)'
+EXEC SF_Replicate 'CFG_NMSS_QA','Interest__c','pkchunk,batchsize(50000)'

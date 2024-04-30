@@ -29,7 +29,7 @@ NULL																AS [Id] -- Salesforce ID
 		WHEN UL.ID IS NULL THEN Us.ID
 		ELSE UL.ID 
 	 END															AS [LastModifiedById]
-	 ,RC.ActiveFlag																AS IsActive__c
+	 ,0																AS IsActive__c
 FROM [TommiQA1].[dbo].apfx_refResourceCategory RC
 	 LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] U
 		ON RC.CreatedUserId = U.[Data_Warehouse_ID__c]

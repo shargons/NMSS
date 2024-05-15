@@ -1,7 +1,7 @@
 USE [CFG_NMSS_QA]
 GO
 
-/****** Object:  View [dbo].[NMSS_Navigator_Individuals]    Script Date: 5/8/2024 1:09:39 PM ******/
+/****** Object:  View [dbo].[NMSS_Navigator_Individuals]    Script Date: 5/8/2024 2:20:57 PM ******/
 SET ANSI_NULLS ON
 GO
 
@@ -9,7 +9,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE OR ALTER  VIEW [dbo].[NMSS_Navigator_Individuals] AS
+
+CREATE OR ALTER VIEW [dbo].[NMSS_Navigator_Individuals] AS
 select distinct ConstituentId
 from [TommiQA1].dbo.apfx_interaction i
 join [TommiQA1].dbo.apfx_interactiondetail id on i.interactionid = id.interactionid
@@ -31,4 +32,5 @@ and id.ActiveFlag = 1
 and firstname is not null --exclude individuals where first name blank
 and lastname not in ('Anonymous', ' ') --exclude individuals where lastname 'Anonymous' or blank
 GO
+
 

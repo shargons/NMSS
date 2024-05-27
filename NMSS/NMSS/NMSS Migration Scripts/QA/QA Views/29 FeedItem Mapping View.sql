@@ -56,6 +56,6 @@ SELECT
 	LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] UC
 			ON id.CreatedUserId = UC.[Data_Warehouse_ID__c]
 	WHERE id.DetailTypeCode in ('1','L', 'P', 'R')
-	AND ID.Comments IS NOT NULL
+	AND ID.Comments IS NOT NULL and I.InteractionDetailId = 155495377
 
 

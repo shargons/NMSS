@@ -1,4 +1,4 @@
-
+﻿
 --DROP TABLE T_ROIFiles
 SELECT Filename,Folder+'\'+Filename as FilePath,SUBSTRING(Folder,PATINDEX('%[0-9]%',Folder),8) as ConstituentId
 --INTO CFG_NMSS_PREPROD.dbo.T_ROIFiles
@@ -69,14 +69,13 @@ DROP TABLE Case_TFile_Insert
  ,'Historical Files' as Subject
  ,'Case created to hold T Drive Case Files' as Description
  , C.SFID AS ContactId
- ,R.Id as RecordTypeId
- ,'Closed' AS Status
+ --,R.Id as RecordTypeId
  INTO [CFG_NMSS_PREPROD].[dbo].Case_TFile_Insert
  FROM [CFG_NMSS_PREPROD].[dbo].[T_CaseFiles] A
   INNER JOIN [NMSS_SRC].[SFINTEGRATION].[dbo].[XREF_Contact] C
  ON A.ConstituentId = C.DWID
- LEFT JOIN [CFG_NMSS_PREPROD].dbo.RecordType R
- ON R.DeveloperName = 'Navigator_Support_Request'
+ --LEFT JOIN [CFG_NMSS_PREPROD].dbo.RecordType R
+ --ON R.DeveloperName = 'Navigator_Case'
 
 /******* Change ID Column to nvarchar(18) *********/
 ALTER TABLE Case_TFile_Insert
@@ -102,26 +101,35 @@ FROM Case_TFile_Insert_Result
  --====================================================================
 --PREPARE DATA TO INSERT - ContentVersion ROI
 --====================================================================
-DROP TABLE ContentVersion_ROI_A_Insert_Test
+DROP TABLE ContentVersion_ROI_K_Insert
 
 
-SELECT
+SELECT 
   NULL AS ID
  ,LEFT(FileName,80) as Legacy_ID__c
- ,REPLACE(FilePath,'Y:','C:') AS PathOnClient
+ ,REPLACE(FilePath,'Y:','‪C:') AS PathOnClient
  ,1 as IsMajorVersion
  ,FileName as Title
  ,'P' as PublishStatus
  ,'N' as SharingPrivacy
- ,REPLACE(FilePath,'Y:','C:') AS VersionData
+ ,REPLACE(FilePath,'Y:','‪C:') as VersionData
  ,B.ID AS FirstPublishLocationId -- Get id from Consent_for_Release_of_Information__c_TFilesA_Insert
- INTO ContentVersion_ROI_A_Insert
+ INTO ContentVersion_ROI_K_Insert
  FROM [CFG_NMSS_PREPROD].[dbo].[T_ROIFiles] A
   INNER JOIN ROI_TFiles_Lookup B
  ON LEFT(FileName,80) = B.Legacy_ID__c
- WHERE FilePath LIKE '%\A\%'
+ WHERE FilePath LIKE '%\K\%'
 
- SELECT * FROM ContentVersion_ROI_A_Insert
+ SELECT * FROM ContentVersion_ROI_K_Insert
+  where FirstPublishLocationId IS NULL
+
+  UPDATE A
+SET A.PathOnClient = REPLACE(PathOnClient,'?','')
+FROM ContentVersion_ROI_K_Insert A
+
+UPDATE A
+SET A.VersionData = REPLACE(VersionData,'?','')
+FROM ContentVersion_ROI_K_Insert A
 
 
 
@@ -129,22 +137,26 @@ SELECT
 --INSERTING DATA USING DBAMP - ROI
 --====================================================================
 /******* Change ID Column to nvarchar(18) *********/
-ALTER TABLE ContentVersion_ROI_A_Insert
+ALTER TABLE ContentVersion_ROI_K_Insert
 ALTER COLUMN ID NVARCHAR(18)
 
 /******* DBAmp Insert Script *********/
-EXEC SF_TableLoader 'Insert:soap,batchsize(1)','CFG_NMSS_PREPROD','ContentVersion_ROI_A_Insert'
+EXEC SF_TableLoader 'Insert:soap,batchsize(1)','CFG_NMSS_PREPROD','ContentVersion_ROI_K_Insert'
 
-SELECT * FROM ContentVersion_ROI_A_Insert_Result where Error <> 'Operation Successful.'
+SELECT *
+--INTO ContentVersion_ROI_F_Insert_2
+FROM ContentVersion_ROI_J_Insert_Result 
+where Error <> 'Operation Successful.'
 
-select count(*), Error fromContentVersion_ROI_A_Insert_Result GROUP BY Error
+
+select count(*), Error from ContentVersion_ROI_J_Insert_Result GROUP BY Error
 
 /******* DBAmp Delete Script *********/
 DROP TABLE ContentVersion_DELETE
 DECLARE @_table_server	nvarchar(255)	=	DB_NAME()
 EXECUTE sf_generate 'Delete',@_table_server, 'ContentVersion_DELETE'
 
-INSERT INTO ContentVersion_DELETE(Id) SELECT Id FROM ContentVersion_ROI_A_Insert_TEST_Result WHERE Error = 'Operation Successful.'
+INSERT INTO ContentVersion_DELETE(Id) SELECT Id FROM ContentVersion_ROI_J_Insert_Result WHERE Error = 'Operation Successful.'
 
 DECLARE @_table_server	nvarchar(255) = DB_NAME()
 EXECUTE	SF_TableLoader
@@ -158,36 +170,41 @@ EXECUTE	SF_TableLoader
 --====================================================================
 
  -- Case Files 
- DROP TABLE ContentVersion_CaseFile_A_Insert
+ DROP TABLE ContentVersion_CaseFile_J_Insert
 
-SELECT 
+SELECT
   NULL AS ID
  ,'CaseFile'+ConstituentId as Legacy_ID__c
  ,REPLACE(FilePath,'Y:','C:') AS PathOnClient
+ --,FilePath as PathOnClient
  ,1 as IsMajorVersion
  ,FileName as Title
  ,'P' as PublishStatus
  ,'N' as SharingPrivacy
  ,REPLACE(FilePath,'Y:','C:') AS VersionData
+ --,FilePath as VersionData
  ,B.ID AS FirstPublishLocationId -- Get id from Case_TFilesA_Insert
- INTO ContentVersion_CaseFile_A_Insert
+ INTO ContentVersion_CaseFile_J_Insert
  FROM [CFG_NMSS_PREPROD].[dbo].[T_CaseFiles] A
   JOIN Case_TFiles_Lookup B
  ON 'CaseFile'+ConstituentId = B.Data_WarehouseID__c
-  WHERE FilePath LIKE '%\A\%'
+  WHERE FilePath LIKE '%\J\%'
 
  --====================================================================
 --INSERTING DATA USING DBAMP - ContentVersion
 --====================================================================
 /******* Change ID Column to nvarchar(18) *********/
-ALTER TABLE ContentVersion_CaseFile_A_Insert
+ALTER TABLE ContentVersion_CaseFile_J_Insert
 ALTER COLUMN ID NVARCHAR(18)
 
-SELECT * FROM ContentVersion_CaseFile_A_Insert
+SELECT * FROM ContentVersion_CaseFile_J_Insert
+ where FirstPublishLocationId IS NULL
 
 /******* DBAmp Insert Script *********/
-EXEC SF_TableLoader 'Insert:soap,batchsize(1)','CFG_NMSS_PREPROD','ContentVersion_CaseFile_A_Insert'
+EXEC SF_TableLoader 'Insert:soap,batchsize(1)','CFG_NMSS_PREPROD','ContentVersion_CaseFile_J_Insert'
 
-SELECT * FROM ContentVersion_CaseFile_A_Insert_Result where Error <> 'Operation Successful.'
+SELECT * FROM ContentVersion_CaseFile_J_Insert_Result where Error <> 'Operation Successful.'
 
-select count(*), Error from Contentversion_A_Insert_Result GROUP BY Error
+SELECT * FROM ContentVersion_CaseFile_J_Insert_Result where Error LIKE '%could not find file%'
+
+select count(*), Error from ContentVersion_CaseFile_J_Insert_Result GROUP BY Error

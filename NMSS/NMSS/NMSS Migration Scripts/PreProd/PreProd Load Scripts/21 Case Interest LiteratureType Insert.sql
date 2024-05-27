@@ -13,7 +13,7 @@ SELECT *
 GO
 
 /******* Check Load table *********/
-SELECT *
+SELECT distinct Interest__c
 FROM InterestedCase__c_LT_Load
 
 /******* Change ID Column to nvarchar(18) *********/

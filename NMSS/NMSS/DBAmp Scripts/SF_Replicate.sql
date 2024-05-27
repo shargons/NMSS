@@ -1,1 +1,1 @@
-EXEC SF_Replicate 'CFG_NMSS_PREPROD','InterestedCase__c','pkchunk,batchsize(50000)'
+EXEC SF_Replicate 'CFG_NMSS_PREPROD','Case','pkchunk,batchsize(50000)'

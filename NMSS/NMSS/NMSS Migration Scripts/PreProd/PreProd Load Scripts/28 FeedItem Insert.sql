@@ -65,9 +65,53 @@ ALTER COLUMN ID NVARCHAR(18)
 /******* DBAmp Insert Script *********/
 EXEC SF_TableLoader 'Insert:BULKAPI','CFG_NMSS_PREPROD','FeedItem_T1_LOAD'
 
-SELECT * FROM FeedItem_T1_LOAD_Result where Error <> 'Operation Successful.'
+SELECT ParentId as CaseID,  
+--INTO FeedItem_T1_LOAD_2
+FROM FeedItem_T1_LOAD_Result where Error <> 'Operation Successful.'
 
-select count(*), Error from FeedItem_T1_LOAD_Result GROUP BY Error
+select count(*), Error from FeedItem_T1_LOAD_2_Result GROUP BY Error
+
+/***** Load Errored Records ******/
+
+SELECT Y.* 
+FROM 
+(
+	SELECT X.*,LEN(Body) as BodyLength
+	--INTO FeedItem_Test_2
+	FROM
+	(
+			SELECT
+				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+				SUBSTRING(TRIM(Body),1,9500) as Body
+            
+			FROM
+				FeedItem_T1_LOAD_2
+			UNION ALL
+			SELECT
+				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+				'Previous Comment Continued...'+CHAR(10)+SUBSTRING(TRIM(Body),9501,9500) as Body
+			FROM
+				FeedItem_T1_LOAD_2
+			UNION ALL
+			SELECT
+				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+				'Previous Comment Continued...'+CHAR(10)+SUBSTRING(TRIM(Body),19001,9500) as Body
+			FROM
+				FeedItem_T1_LOAD_2
+			--UNION ALL
+			--SELECT
+			--	Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+			--	'Previous Comment Continued...'+CHAR(10)+SUBSTRING(TRIM(Body),20001,28000) as Body
+			--FROM
+			--	FeedItem_T1_LOAD_2
+
+			)X
+	)Y
+	WHERE Y.BodyLength > 30
+
+
+
+
 
 -- L Type
 /******* DBAmp Insert Script *********/

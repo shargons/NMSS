@@ -6,11 +6,11 @@
     "\\NMSS\\NMSS\\Indexes",
     "\\NMSS\\NMSS\\NMSS Migration Scripts",
     "\\NMSS\\NMSS\\NMSS Migration Scripts\\PreProd",
+    "\\NMSS\\NMSS\\NMSS Migration Scripts\\PreProd\\PreProd Load Scripts",
     "\\NMSS\\NMSS\\NMSS Migration Scripts\\PreProd\\PreProd Views",
     "\\NMSS\\NMSS\\NMSS Migration Scripts\\QA",
-    "\\NMSS\\NMSS\\NMSS Migration Scripts\\QA\\QA Load Scripts",
     "\\NMSS\\NMSS\\NMSS Migration Scripts\\QA\\QA Views"
   ],
-  "SelectedNode": "\\NMSS\\NMSS\\NMSS Migration Scripts\\PreProd\\PreProd Views\\06 Case Mapping View.sql",
+  "SelectedNode": "\\NMSS\\NMSS\\NMSS Migration Scripts\\PreProd\\PreProd Load Scripts\\28 FeedItem Insert.sql",
   "PreviewInSolutionExplorer": false
 }

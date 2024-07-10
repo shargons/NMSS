@@ -191,6 +191,6 @@ SELECT * FROM ContentVersion_CaseFile_E_Insert
 /******* DBAmp Insert Script *********/
 EXEC SF_TableLoader 'Insert:soap,batchsize(1)','CFG_NMSS_PREPROD','ContentVersion_CaseFile_E_Insert'
 
-SELECT * FROM ContentVersion_CaseFile_D_Insert_Result where Error <> 'Operation Successful.'
+SELECT * FROM ContentVersion_CaseFile_E_Insert_Result where Error <> 'Operation Successful.'
 
 select count(*), Error from ContentVersion_CaseFile_D_Insert_Result GROUP BY Error

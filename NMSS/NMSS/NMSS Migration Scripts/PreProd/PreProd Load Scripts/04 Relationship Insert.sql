@@ -1,5 +1,5 @@
 
-USE CFG_NMSS_PREPROD;
+USE CFG_NMSS_PROD;
 
 
 --====================================================================
@@ -20,11 +20,11 @@ SELECT DISTINCT C.[Id]
       ,C.[npe4__Status__c]
       ,C.[npe4__Type__c]
       ,ISNULL(C.[Authorized_to_Discuss__c],0) as [Authorized_to_Discuss__c]
-INTO [CFG_NMSS_PREPROD].dbo.npe4__Relationship__c_LOAD
-FROM [NMSS_SRC].[CFG_NMSS_QA].[dbo].[vw_DW_SFDC_Relationship] C
-INNER JOIN [NMSS_SRC].[SFINTEGRATION].dbo.[XREF_Contact] AL
+INTO [CFG_NMSS_PROD].dbo.npe4__Relationship__c_LOAD
+FROM [CFG_NMSS_PROD].[dbo].[vw_DW_SFDC_Relationship] C
+INNER JOIN [CFG_NMSS_PROD].dbo.[XREF_Contact] AL
 ON C.[Source_npe4__RelatedContact__c] = AL.DWID
-INNER JOIN  [NMSS_SRC].[SFINTEGRATION].dbo.[XREF_Contact] CL
+INNER JOIN [CFG_NMSS_PROD].dbo.[XREF_Contact] CL
 ON C.[Source_npe4__Contact__c] = CL.DWID
 
 

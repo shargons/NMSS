@@ -1,4 +1,4 @@
-USE CFG_NMSS_PREPROD;
+USE CFG_NMSS_PROD;
 
 /*** Creating XREF tables in QA ***/
 
@@ -119,7 +119,7 @@ INTO [dbo].[XREF_Case]
 FROM [Case]
 
 -- FARequest XRef Table
-IF OBJECT_ID(N'dbo.XREF_Case', N'U') IS NOT NULL  
+IF OBJECT_ID(N'dbo.XREF_FARequest', N'U') IS NOT NULL  
 DROP TABLE [dbo].[XREF_Case];  
 GO
 

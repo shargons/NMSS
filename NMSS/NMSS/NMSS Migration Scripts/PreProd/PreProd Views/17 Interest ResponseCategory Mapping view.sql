@@ -1,4 +1,4 @@
-USE [CFG_NMSS_QA]
+USE [CFG_NMSS_PROD]
 GO
 
 /****** Object:  View [dbo].[vw_DW_CFG_ResourceType_Interest]    Script Date: 3/5/2024 12:54:07 PM ******/
@@ -30,13 +30,13 @@ NULL																AS [Id] -- Salesforce ID
 		ELSE UL.ID 
 	 END															AS [LastModifiedById]
 	 ,0													AS IsActive__c
-FROM [TommiQA1].[dbo].apfx_refResponseCategory RC
-	 LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] U
+FROM [tommiprd1].[dbo].apfx_refResponseCategory RC
+	 LEFT JOIN [CFG_NMSS_PROD].[dbo].[vw_DW_CFG_User] U
 		ON RC.CreatedUserId = U.[Data_Warehouse_ID__c]
-	 LEFT JOIN [CFG_NMSS_QA].[dbo].[User] Us
+	 LEFT JOIN [CFG_NMSS_PROD].[dbo].[User] Us
 		ON Us.Name = 'Migrations User'
-	 LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] UC
+	 LEFT JOIN [CFG_NMSS_PROD].[dbo].[vw_DW_CFG_User] UC
 		ON RC.CreatedUserId = UC.[Data_Warehouse_ID__c]
-	 LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] UL
+	 LEFT JOIN [CFG_NMSS_PROD].[dbo].[vw_DW_CFG_User] UL
 		ON RC.UpdatedUserId = UL.[Data_Warehouse_ID__c]
 WHERE RC.ActiveFlag = 1

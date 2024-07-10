@@ -1,4 +1,4 @@
-USE [CFG_NMSS_QA]
+USE [CFG_NMSS_PREPROD]
 GO
 
 /****** Object:  View [dbo].[vw_DW_CFG_Case]    Script Date: 3/18/2024 6:19:31 PM ******/
@@ -29,14 +29,14 @@ SELECT
 	 ,'TrackedTopic'+CAST(IRT.TrackedTopicId AS NVARCHAR)								AS [Legacy_Interest__c]
 	 ,I.Id										AS Interest__c
 	 ,IRT.CreatedDate							    AS [CreatedDate]
-FROM [TommiQA1].[dbo].[apfx_InteractionDetailTrackedTopic] IRT
-  INNER JOIN [CFG_NMSS_QA].[dbo].[Case] C
+FROM [NMSS_SRC].[TommiQA1].[dbo].[apfx_InteractionDetailTrackedTopic] IRT
+  INNER JOIN [CFG_NMSS_PREPROD].[dbo].[Case] C
 	ON IRT.InteractionId = C.Data_Warehouse_ID__c
-  INNER JOIN [CFG_NMSS_QA].[dbo].[Interest__c] I
+  INNER JOIN [CFG_NMSS_PREPROD].[dbo].[Interest__c] I
     ON I.DWUI_Tracked_Topic_ID__c = 'TrackedTopic'+CAST(IRT.TrackedTopicId AS NVARCHAR)
-	LEFT JOIN [CFG_NMSS_QA].[dbo].[User] Us
+	LEFT JOIN [CFG_NMSS_PREPROD].[dbo].[User] Us
 		ON Us.Name = 'Migrations User'
-	LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] UC
+	LEFT JOIN [NMSS_SRC].[CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] UC
 		ON IRT.CreatedUserId = UC.[Data_Warehouse_ID__c]
 
      

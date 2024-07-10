@@ -37,6 +37,7 @@ SELECT DISTINCT
 	 ELSE UC.ID 
  END																			            as [CreatedById]
 , 'Paid'																				    as Status__c
+,cp.CompleteFlag
 FROM [TommiQA1].[dbo].apfx_ConstituentKeyProcess cp 
 JOIN [TommiQA1].[dbo].apfx_constituentkeyprocessstep cs 
 	on cp.constituentkeyprocessid = cs.constituentkeyprocessid 
@@ -65,6 +66,7 @@ LEFT JOIN [CFG_NMSS_QA].[dbo].[User] Us
 			ON Us.Name = 'Migrations User'
 LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] UC
 			ON cp.CreatedUserId = UC.[Data_Warehouse_ID__c]
-where  cs.ActiveFlag = 1 and vc.KeyProcessValueCategoryName = 'Leveraged Financial Benefit'  and cp.CompleteFlag = 1 
+where  cs.ActiveFlag = 1 and vc.KeyProcessValueCategoryName = 'Leveraged Financial Benefit'  
+--and cp.CompleteFlag = 1 
 ORDER BY cp.ConstituentKeyProcessId
 OFFSET 0 ROWS

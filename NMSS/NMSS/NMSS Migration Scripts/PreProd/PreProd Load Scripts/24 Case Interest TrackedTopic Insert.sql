@@ -1,4 +1,4 @@
-USE CFG_NMSS_PREPROD;
+USE CFG_NMSS_PROD;
 
 
 --====================================================================
@@ -9,7 +9,7 @@ USE CFG_NMSS_PREPROD;
 --DROP table InterestedCase__c_TT_Load
 SELECT *
   INTO InterestedCase__c_TT_Load
-  FROM [NMSS_SRC].[CFG_NMSS_QA].[dbo].[vw_DW_CFG_CaseInterestTT]
+  FROM [NMSS_PRD].[CFG_NMSS_PROD].[dbo].[vw_DW_CFG_CaseInterestTT]
 GO
 
 /******* Check Load table *********/
@@ -25,9 +25,9 @@ ALTER COLUMN ID NVARCHAR(18)
 --====================================================================
 
 /******* DBAmp Insert Script *********/
-EXEC SF_TableLoader 'Insert:BULKAPI2','CFG_NMSS_PREPROD','InterestedCase__c_TT_Load'
+EXEC SF_TableLoader 'Insert:BULKAPI2','CFG_NMSS_PROD','InterestedCase__c_TT_Load'
 
-SELECT * FROM InterestedCase__c_TT_Load_Result where Error ='Operation Successful.'
+SELECT * FROM InterestedCase__c_TT_Load_Result where Error <> 'Operation Successful.'
 
 select DISTINCT Error from InterestedCase__c_TT_Load_Result
 
@@ -38,7 +38,8 @@ select DISTINCT Error from InterestedCase__c_TT_Load_Result
 /******* DBAmp Delete Script *********/
 DROP TABLE  InterestedCase__c_DELETE
 
-SELECT ID INTO InterestedCase__c_DELETE FROM InterestedCase__c_TT_Load_Result WHERE Error = 'Operation Successful.'
+SELECT ID INTO InterestedCase__c_DELETE FROM InterestedCase__c
+
 
 DECLARE @_table_server	nvarchar(255) = DB_NAME()
 EXECUTE	SF_TableLoader

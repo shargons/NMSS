@@ -46,7 +46,7 @@ GO
 CREATE OR ALTER View [dbo].[vw_DW_SFDC_Warning__c] AS   
   SELECT    
    XREF.SFID                        AS [Id] -- Salesforce ID
-  ,   'DWUI Migration Alert'					     AS [Name] -- Alert Name
+  ,  LEFT(CW.Comment,80)							 AS [Name] -- Alert Name
   ,   CW.ConstituentWarningId                        AS [Data_Warehouse_ID__c]  -- Source Warehouse_id   
   ,   CW.CreatedDate                                 AS [CreatedDate] --  datetime  
   ,   CW.UpdatedDate                                 AS [LastModifiedDate] --  datetime  

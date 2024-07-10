@@ -23,7 +23,7 @@ FROM
 		NULL											AS [Id] -- Salesforce ID
 		,I.InteractionId							    AS [Data_Warehouse_ID__c]  -- Source Warehouse_id
 		,I.ConstituentId								AS [Source_WhoId]	-- Lookup(Contact)
-		,I.InteractionDateTime							AS [ClosedDate]
+		,DATEADD(hour, 12, DATEDIFF(DAY, 0, cp.CompleteDate))							AS [ClosedDate]
 		,IM.InteractionModeName							AS [Origin] -- Picklist
 		,IT.InteractionCategoryName						AS [Type] -- Picklist
 		,ISNULL(I.ConfidentialFlag,0)					AS [Confidential__c]
@@ -31,11 +31,9 @@ FROM
 			WHEN I.CompletedFlag = 0 THEN 'Closed'
 			ELSE 'Service Navigation'
 		 END											AS [Status] -- Picklist
-		,I.InteractionDateTime							AS [CreatedDate] -- DateTime
+		,DATEADD(hour, 12, DATEDIFF(DAY, 0, cp.CreatedDate))							AS [CreatedDate] -- DateTime
 		,I.Comments										AS [Description] -- Long Text
-		,CASE WHEN I.Description IS NOT NULL THEN I.Description
-			  ELSE	SUBSTRING(I.Comments,1,PATINDEX('% %',I.COMMENTS)) 
-		END												AS [Subject] --  Text
+		,'DFA'											AS [Subject] --  Text
 		,CASE 
 			WHEN U.ID IS NULL THEN Us.ID
 			ELSE U.ID 
@@ -78,11 +76,13 @@ FROM
 			ON I.UpdatedUserId = UL.[Data_Warehouse_ID__c]
 		LEFT JOIN [CFG_NMSS_QA].[dbo].[Recordtype] R
 		ON R.DeveloperName = 'Navigator_Support_Request'
+		LEFT JOIN TommiQA1.dbo.apfx_ConstituentKeyProcess cp
+	    ON cp.InteractionId = I.InteractionId
 	WHERE I.ActiveFlag = 1
 	and I.interactioncategoryid in (59,61) --Strategy Area for Advocacy and Services
 	and (rc.ResponseCategoryId in (232,207,209,198,195,228) --These are the Tier 1 Response Categories used by Services
 	or id.ResponseTypeId = 634 --This is necessary to get the Hot Topic Interactions
-	or id.DetailTypeCode in ('A','B', 'C', 'F', 'L', 'P', 'R', 'B')) --These are all the non-Tier 1 interaction categories
+	or id.DetailTypeCode in ('F')) --These are all the non-Tier 1 interaction categories
 	and id.ActiveFlag = 1 
 )X
 WHERE X.DetailTypeCode = 'F'

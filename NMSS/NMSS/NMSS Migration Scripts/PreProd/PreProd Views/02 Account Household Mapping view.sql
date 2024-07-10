@@ -1,6 +1,6 @@
 
 
-USE [CFG_NMSS_QA]
+USE [CFG_NMSS_PROD]
 GO
 
 /****** Object:  View [dbo].[vw_DW_SFDC_Account_Household]    Script Date: 2/22/2024 12:51:33 PM ******/
@@ -61,16 +61,16 @@ SELECT
 ,   H.UpdatedDate                                  AS [LastModifiedDate] --  datetime
 ,   H.ActiveFlag                                   AS [Active__c] --  bit
 ,	M.Market__c     							   AS [Market__c]
-FROM [CFG_NMSS_QA].dbo.tbl_Qualified_Entity as qe with(nolock)
-INNER JOIN [TommiQA1].[dbo].apfx_Entity AS E
+FROM [CFG_NMSS_PROD].dbo.tbl_Qualified_Entity as qe with(nolock)
+INNER JOIN [NMSS_PRD].[Tommiprd1].[dbo].apfx_Entity AS E
 	ON E.EntityId = QE.EntityId
-INNER JOIN [TommiQA1].[dbo].apfx_Household AS H
+INNER JOIN [NMSS_PRD].[Tommiprd1].[dbo].apfx_Household AS H
 	ON 	E.HouseholdId = H.HouseholdId
-LEFT JOIN [SFIntegration].dbo.vw_NMSS_help_Household_Market m
+LEFT JOIN [NMSS_PRD].[SFIntegration].dbo.vw_NMSS_help_Household_Market m
 	ON m.Data_Warehouse_ID__c = h.householdid
 LEFT JOIN [dbo].[RecordType] AS RT ON 
       RT.Name='Household' AND RT.sObjectType='Account'
-LEFT JOIN [SFIntegration].dbo.XREF_Account_Household as xref
+LEFT JOIN [NMSS_PRD].[SFIntegration].dbo.XREF_Account_Household as xref
 	ON XREF.DWID = CONCAT('HHD', H.HouseholdId)
 WHERE	
 XREF.SFID IS NULL and
@@ -88,16 +88,16 @@ SELECT
 ,   H.UpdatedDate                                  AS [LastModifiedDate] --  datetime
 ,   H.ActiveFlag                                   AS [Active__c] --  bit
 ,	M.Market__c						         	   AS [Market__c]
-FROM [CFG_NMSS_QA].dbo.tbl_Qualified_Entity as qe with(nolock)
-INNER JOIN [TommiQA1].[dbo].apfx_Entity AS E
+FROM [CFG_NMSS_PROD].dbo.tbl_Qualified_Entity as qe with(nolock)
+INNER JOIN [NMSS_PRD].[Tommiprd1].[dbo].apfx_Entity AS E
 	ON E.EntityId = QE.EntityId
-INNER JOIN [TommiQA1].[dbo].apfx_Household AS H
+INNER JOIN [NMSS_PRD].[Tommiprd1].[dbo].apfx_Household AS H
 	ON 	E.HouseholdId = H.HouseholdId
-LEFT JOIN [SFIntegration].dbo.vw_NMSS_help_Household_Market m
+LEFT JOIN [NMSS_PRD].[SFIntegration].dbo.vw_NMSS_help_Household_Market m
 	ON m.Data_Warehouse_ID__c = h.householdid
-LEFT JOIN [dbo].[RecordType] AS RT ON 
+LEFT JOIN [CFG_NMSS_PROD].[dbo].[RecordType] AS RT ON 
       RT.Name='Household' AND RT.sObjectType='Account'
-LEFT JOIN dbo.XREF_Account_Household as xref
+LEFT JOIN [CFG_NMSS_PROD].dbo.XREF_Account_Household as xref
 	ON XREF.DWID = CONCAT('HHD', H.HouseholdId)
 WHERE	
 --QE.Entity_Type = 'I' and 

@@ -54,7 +54,7 @@ FROM
 	, CASE WHEN cp.CompleteFlag = 1 THEN 'Leveraged Resources Received'
 		   ELSE 'Active FA Payments' 
 	  END																    as Status__c
-	, amount.Agg_DollarAmount                                                        as Award_Amount__c 
+	, amount.Agg_DollarAmount                                               as Award_Amount__c 
 	, 'Leveraged'															as Award_Type__c
 	, CASE WHEN rk.LastStepFlag = 1 THEN ISNULL(cs.Comments,'')+char(10)+char(10)+ISNULL(Agg_Desc_Comment.Comment_TypeDesc,'')
 	  ELSE  ISNULL(Agg_Comments,'')+char(10)+char(10)+ISNULL(Agg_Desc_Comment.Comment_TypeDesc,'')

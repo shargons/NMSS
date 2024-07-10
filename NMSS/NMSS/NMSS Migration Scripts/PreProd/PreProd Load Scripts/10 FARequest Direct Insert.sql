@@ -27,10 +27,10 @@ SELECT F.ID
       ,F.[OwnerId]
       ,F.[CreatedById]
   INTO FA_Request__c_Direct_Load
-  FROM [NMSS_SRC].[CFG_NMSS_QA].[dbo].[vw_DW_CFG_DirectFARequest] F
-	   INNER JOIN [CFG_NMSS_PREPROD].[dbo].[Case] C 
+  FROM [NMSS_PRD].[CFG_NMSS_PROD].[dbo].[vw_DW_CFG_DirectFARequest] F
+	   INNER JOIN [CFG_NMSS_PROD].[dbo].[Case] C 
 	   ON C.Data_Warehouse_ID__c = F.[Source_CaseID]
-	   INNER JOIN [NMSS_SRC].[SFINTEGRATION].[dbo].[XREF_Contact] C2
+	   INNER JOIN [NMSS_PRD].[SFINTEGRATION].[dbo].[XREF_Contact] C2
 	   ON F.[Source_Beneficiary_Contact__c] = C2.DWID
 
 /******* Check Load table *********/
@@ -46,9 +46,11 @@ ALTER COLUMN ID NVARCHAR(18)
 --====================================================================
 
 /******* DBAmp Insert Script *********/
-EXEC SF_TableLoader 'Insert:BULKAPI','CFG_NMSS_PREPROD','FA_Request__c_Direct_Load'
+EXEC SF_TableLoader 'Insert:BULKAPI','CFG_NMSS_PROD','FA_Request__c_Direct_Load_2'
 
-SELECT * FROM FA_Request__c_Direct_Load_Result where Error ='Operation Successful.'
+SELECT * 
+--INTO FA_Request__c_Direct_Load_2
+FROM FA_Request__c_Direct_Load_2_Result where Error <> 'Operation Successful.'
 
 select DISTINCT Error from FA_Request__c_Direct_Load_Result
 
@@ -86,7 +88,7 @@ EXECUTE	SF_TableLoader
 --POPULATING XREF TABLES- Case Interest Response Type
 --====================================================================
 --TRUNCATE TABLE [CFG_NMSS_QA].[dbo].[XREF_FARequest]
-INSERT INTO [CFG_NMSS_PREPROD].[dbo].[XREF_FARequest]
+INSERT INTO [CFG_NMSS_PROD].[dbo].[XREF_FARequest]
            ([SFID]
            ,[DWID]
            ,[SystemOfCreation]
@@ -109,5 +111,6 @@ GO
 
 INSERT INTO [dbo].[FARequest_Lookup]
 SELECT ID ,[DWUI_Interaction_ID__c] as LegacyID
+--INTO [dbo].[FARequest_Lookup]
 FROM FA_Request__c_Direct_Load_2_Result
 where Error = 'Operation Successful.'

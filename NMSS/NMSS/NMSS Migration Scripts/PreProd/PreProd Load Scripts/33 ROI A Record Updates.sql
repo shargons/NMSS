@@ -1,22 +1,25 @@
 
 --- Expiry Date
 --DROP TABLE Consent_for_Release_of_Information__c_ExpiryDate_Update
-SELECT x.FirstPublishLocationId AS ID,IIF(ISDATE(x.ExpiryDate)=1,CAST(x.ExpiryDate AS date) ,NULL) AS Expiration_Date__c
+SELECT x.FirstPublishLocationId AS ID,IIF(ISDATE(x.ExpiryDate)=1,CAST(x.ExpiryDate AS date) ,NULL) AS Expiration_Date__c,NULL AS Date_Sent__c
 INTO Consent_for_Release_of_Information__c_ExpiryDate_Update
 FROM 
 (
 SELECT Title,FirstPublishLocationId,
 IIF(LEN(SUBSTRING(Title,PATINDEX('%EXP%',Title)+4,4))=4,SUBSTRING(Title,PATINDEX('%EXP%',Title)+4,4),NULL) +'-'+
 IIF(LEN(SUBSTRING(Title,PATINDEX('%EXP%',Title)+9,2))=2,SUBSTRING(Title,PATINDEX('%EXP%',Title)+9,2),NULL) +'-'+
-IIF(LEN(SUBSTRING(Title,PATINDEX('%EXP%',Title)+12,2))=2 AND SUBSTRING(Title,PATINDEX('%EXP%',Title)+12,2) like '%[0-9]%',SUBSTRING(Title,PATINDEX('%EXP%',Title)+9,2),'01') AS ExpiryDate
+IIF(LEN(SUBSTRING(Title,PATINDEX('%EXP%',Title)+12,2))=2 AND SUBSTRING(Title,PATINDEX('%EXP%',Title)+12,2) like '%[0-9]%',SUBSTRING(Title,PATINDEX('%EXP%',Title)+12,2),'01') AS ExpiryDate
 FROM [CFG_NMSS_PREPROD].[dbo].[ContentVersion_ROI_A_Insert_Result]
 where Title LIKE '%exp%'
 )x
 
 EXEC SF_TableLoader 'Update:BULKAPI','CFG_NMSS_PREPROD','Consent_for_Release_of_Information__c_ExpiryDate_Update'
 
+SELECT * FROM Consent_for_Release_of_Information__c_ExpiryDate_Update
+
 --- FORMAT EXP YYYY MM
-SELECT x.FirstPublishLocationId AS ID,IIF(ISDATE(x.ExpiryDate)=1,CAST(x.ExpiryDate AS date) ,NULL) AS Expiration_Date__c
+--drop table Consent_for_Release_of_Information__c_ExpiryDate_Update_2
+SELECT x.FirstPublishLocationId AS ID,IIF(ISDATE(x.ExpiryDate)=1,CAST(x.ExpiryDate AS date) ,NULL) AS Expiration_Date__c,NULL AS Date_Sent__c
 INTO Consent_for_Release_of_Information__c_ExpiryDate_Update_2
 FROM 
 (
@@ -35,7 +38,7 @@ EXEC SF_TableLoader 'Update:BULKAPI','CFG_NMSS_PREPROD','Consent_for_Release_of_
 
 -- Sent Date
 --DROP TABLE Consent_for_Release_of_Information__c_SentDate_Update
-SELECT x.FirstPublishLocationId AS ID,IIF(ISDATE(x.SentDate)=1,CAST(x.SentDate AS date) ,NULL) AS Date_Sent__c
+SELECT x.FirstPublishLocationId AS ID,IIF(ISDATE(x.SentDate)=1,CAST(x.SentDate AS date) ,NULL) AS Date_Sent__c,NULL AS Expiration_Date__c
 INTO Consent_for_Release_of_Information__c_SentDate_Update
 FROM 
 (
@@ -50,7 +53,8 @@ where Title LIKE '%sent %'
 /******* DBAmp Insert Script *********/
 EXEC SF_TableLoader 'Update:BULKAPI','CFG_NMSS_PREPROD','Consent_for_Release_of_Information__c_SentDate_Update'
 
-SELECT x.FirstPublishLocationId AS ID,IIF(ISDATE(x.SentDate)=1,CAST(x.SentDate AS date) ,NULL) AS Date_Sent__c
+--DROP TABLE Consent_for_Release_of_Information__c_SentDate_Update_2
+SELECT x.FirstPublishLocationId AS ID,IIF(ISDATE(x.SentDate)=1,CAST(x.SentDate AS date) ,NULL) AS Date_Sent__c,NULL AS Expiration_Date__c
 INTO Consent_for_Release_of_Information__c_SentDate_Update_2
 FROM 
 (
@@ -79,7 +83,7 @@ CASE
 WHEN Title LIKE '%Unsigned%' THEN 'Waiting for Response'
 WHEN Title LIKE '%Signed%' THEN 'Complete'
 WHEN Title LIKE '%Revoked%' THEN 'Revoked'
-ELSE 'Waiting for Response'
+ELSE 'Complete'
 END AS Status__c
 FROM [CFG_NMSS_PREPROD].[dbo].[ContentVersion_ROI_A_Insert_Result]
 )x

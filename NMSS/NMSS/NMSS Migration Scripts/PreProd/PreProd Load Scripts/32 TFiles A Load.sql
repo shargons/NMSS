@@ -122,6 +122,7 @@ SELECT
  WHERE FilePath LIKE '%\A\%'
 
  SELECT * FROM ContentVersion_ROI_A_Insert
+ WHERE FirstPublishLocationId IS NULL
 
 
 

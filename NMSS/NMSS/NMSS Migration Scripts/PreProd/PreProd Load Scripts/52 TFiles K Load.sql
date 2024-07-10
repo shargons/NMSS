@@ -145,18 +145,18 @@ EXEC SF_TableLoader 'Insert:soap,batchsize(1)','CFG_NMSS_PREPROD','ContentVersio
 
 SELECT *
 --INTO ContentVersion_ROI_F_Insert_2
-FROM ContentVersion_ROI_J_Insert_Result 
+FROM ContentVersion_ROI_K_Insert_Result 
 where Error <> 'Operation Successful.'
 
 
-select count(*), Error from ContentVersion_ROI_J_Insert_Result GROUP BY Error
+select count(*), Error from ContentVersion_ROI_K_Insert_Result GROUP BY Error
 
 /******* DBAmp Delete Script *********/
 DROP TABLE ContentVersion_DELETE
 DECLARE @_table_server	nvarchar(255)	=	DB_NAME()
 EXECUTE sf_generate 'Delete',@_table_server, 'ContentVersion_DELETE'
 
-INSERT INTO ContentVersion_DELETE(Id) SELECT Id FROM ContentVersion_ROI_J_Insert_Result WHERE Error = 'Operation Successful.'
+INSERT INTO ContentVersion_DELETE(Id) SELECT Id FROM ContentVersion_ROI_K_Insert_Result WHERE Error = 'Operation Successful.'
 
 DECLARE @_table_server	nvarchar(255) = DB_NAME()
 EXECUTE	SF_TableLoader
@@ -170,7 +170,7 @@ EXECUTE	SF_TableLoader
 --====================================================================
 
  -- Case Files 
- DROP TABLE ContentVersion_CaseFile_J_Insert
+ DROP TABLE ContentVersion_CaseFile_K_Insert
 
 SELECT
   NULL AS ID
@@ -184,27 +184,27 @@ SELECT
  ,REPLACE(FilePath,'Y:','C:') AS VersionData
  --,FilePath as VersionData
  ,B.ID AS FirstPublishLocationId -- Get id from Case_TFilesA_Insert
- INTO ContentVersion_CaseFile_J_Insert
+ INTO ContentVersion_CaseFile_K_Insert
  FROM [CFG_NMSS_PREPROD].[dbo].[T_CaseFiles] A
   JOIN Case_TFiles_Lookup B
  ON 'CaseFile'+ConstituentId = B.Data_WarehouseID__c
-  WHERE FilePath LIKE '%\J\%'
+  WHERE FilePath LIKE '%\K\%'
 
  --====================================================================
 --INSERTING DATA USING DBAMP - ContentVersion
 --====================================================================
 /******* Change ID Column to nvarchar(18) *********/
-ALTER TABLE ContentVersion_CaseFile_J_Insert
+ALTER TABLE ContentVersion_CaseFile_K_Insert
 ALTER COLUMN ID NVARCHAR(18)
 
-SELECT * FROM ContentVersion_CaseFile_J_Insert
+SELECT * FROM ContentVersion_CaseFile_K_Insert
  where FirstPublishLocationId IS NULL
 
 /******* DBAmp Insert Script *********/
-EXEC SF_TableLoader 'Insert:soap,batchsize(1)','CFG_NMSS_PREPROD','ContentVersion_CaseFile_J_Insert'
+EXEC SF_TableLoader 'Insert:soap,batchsize(1)','CFG_NMSS_PREPROD','ContentVersion_CaseFile_K_Insert'
 
-SELECT * FROM ContentVersion_CaseFile_J_Insert_Result where Error <> 'Operation Successful.'
+SELECT * FROM ContentVersion_CaseFile_K_Insert_Result where Error <> 'Operation Successful.'
 
-SELECT * FROM ContentVersion_CaseFile_J_Insert_Result where Error LIKE '%could not find file%'
+SELECT * FROM ContentVersion_CaseFile_K_Insert_Result where Error LIKE '%could not find file%'
 
-select count(*), Error from ContentVersion_CaseFile_J_Insert_Result GROUP BY Error
+select count(*), Error from ContentVersion_CaseFile_K_Insert_Result GROUP BY Error

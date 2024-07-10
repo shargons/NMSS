@@ -1,4 +1,4 @@
-USE [CFG_NMSS_QA]
+USE [CFG_NMSS_PROD]
 GO
 
 /****** Object:  View [dbo].[vw_DW_CFG_Case]    Script Date: 3/26/2024 11:28:14 AM ******/
@@ -54,42 +54,43 @@ SELECT DISTINCT
 	 ,R.ID																				AS RecordTypeId
 	 ,id.InteractionDetailId
 	 ,id.DetailTypeCode
-FROM TommiQA1.dbo.apfx_Interaction I
-	left join TommiQA1.dbo.apfx_interactiondetail id 
+FROM Tommiprd1.dbo.apfx_Interaction I
+	left join Tommiprd1.dbo.apfx_interactiondetail id 
 		on i.interactionid = id.interactionid
-	left join TommiQA1.dbo.apfx_InteractionDetailResponseType rt 
+	left join Tommiprd1.dbo.apfx_InteractionDetailResponseType rt 
 		on rt.interactiondetailid = id.interactiondetailid and rt.ActiveFlag = 1
-	left join TommiQA1.dbo.apfx_refResponseType rr 
+	left join Tommiprd1.dbo.apfx_refResponseType rr 
 		on rt.ResponseTypeId = rr.ResponseTypeId
-	left join TommiQA1.dbo.apfx_refResponseCategory rc 
+	left join Tommiprd1.dbo.apfx_refResponseCategory rc 
 		on rr.ResponseCategoryId = rc.ResponseCategoryId
-	left join TommiQA1.dbo.apfx_sysInteractionDetailType dt 
+	left join Tommiprd1.dbo.apfx_sysInteractionDetailType dt 
 		on dt.DetailTypeCode = id.DetailTypeCode
-	 LEFT JOIN TommiQA1.dbo.apfx_refInteractionCategory IT
+	 LEFT JOIN Tommiprd1.dbo.apfx_refInteractionCategory IT
 		ON I.InteractionCategoryId = IT.InteractionCategoryId
-	 LEFT JOIN  TommiQA1.dbo.apfx_refInteractionMode IM
+	 LEFT JOIN  Tommiprd1.dbo.apfx_refInteractionMode IM
 		ON I.InteractionModeId = IM.InteractionModeId
-	 LEFT JOIN TommiQA1.dbo.apfx_Tickler T
+	 LEFT JOIN Tommiprd1.dbo.apfx_Tickler T
 		ON T.InteractionId = I.InteractionId
-	 LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] U
+	 LEFT JOIN [CFG_NMSS_PROD].[dbo].[vw_DW_CFG_User] U
 		ON T.AssignedToUserId = U.[Data_Warehouse_ID__c]
-	 LEFT JOIN [CFG_NMSS_QA].[dbo].[User] Us
+	 LEFT JOIN [CFG_NMSS_PROD].[dbo].[User] Us
 		ON Us.Name = 'Migrations User'
-	 LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] UC
+	 LEFT JOIN [CFG_NMSS_PROD].[dbo].[vw_DW_CFG_User] UC
 		ON I.CreatedUserId = UC.[Data_Warehouse_ID__c]
-	 LEFT JOIN [CFG_NMSS_QA].[dbo].[vw_DW_CFG_User] UL
+	 LEFT JOIN [CFG_NMSS_PROD].[dbo].[vw_DW_CFG_User] UL
 		ON I.UpdatedUserId = UL.[Data_Warehouse_ID__c]
-	LEFT JOIN [CFG_NMSS_QA].[dbo].[Recordtype] R
+	LEFT JOIN [CFG_NMSS_PROD].[dbo].[Recordtype] R
 	ON R.DeveloperName = 'Navigator_Support_Request'
-	LEFT JOIN TommiQA1.dbo.apfx_ConstituentKeyProcess cp
+	LEFT JOIN Tommiprd1.dbo.apfx_ConstituentKeyProcess cp
 	    ON cp.InteractionId = I.InteractionId
 WHERE I.ActiveFlag = 1
 and I.interactioncategoryid in (59,61) --Strategy Area for Advocacy and Services
 and (rc.ResponseCategoryId in (232,207,209,198,195,228) --These are the Tier 1 Response Categories used by Services
 or id.ResponseTypeId = 634 --This is necessary to get the Hot Topic Interactions
-or id.DetailTypeCode in ('A','B', 'C', 'F', 'L', 'P', 'R')) --These are all the non-Tier 1 interaction categories
+or id.DetailTypeCode in ('A', 'L', 'P', 'R') AND id.DetailTypeCode NOT IN ('B','C','F')) --These are all the non-Tier 1 interaction categories
 and id.ActiveFlag = 1  
-AND I.InteractionId = '153412895'
+ORDER BY I.InteractionId
+OFFSET 0 ROWS
 
 GO
 

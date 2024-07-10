@@ -96,3 +96,23 @@ SELECT ID ,[DWUI_Interaction_ID__c] as LegacyID
 INTO [dbo].[FAPayment_Lookup]
 FROM FA_Payment__c_Direct_Load_Result
 where Error = 'Operation Successful.'
+
+--====================================================================
+-- Update Case Status for Open FA Requests
+--====================================================================
+-- Case Status Update
+SELECT DISTINCT
+	  C.Id 
+	  ,'FA Maintenance' as Status
+  INTO Case_FA_Open_Status_Update
+  FROM [NMSS_SRC].[CFG_NMSS_QA].[dbo].[vw_DW_CFG_DirectFAPayment] F
+	   INNER JOIN [CFG_NMSS_PREPROD].[dbo].[Case] C 
+	   ON C.Data_Warehouse_ID__c = F.[Source_CaseID]
+	   INNER JOIN [NMSS_SRC].[SFINTEGRATION].[dbo].[XREF_Contact] C2
+	   ON F.[Source_Constituent__c] = C2.DWID
+	   INNER JOIN [CFG_NMSS_PREPROD].[dbo].[XREF_FARequest] F2
+	   ON F.[DWUI_Interaction_ID__c] = F2.DWID
+ WHERE F.CompleteFlag = 0
+
+ /******* DBAmp Script *********/
+EXEC SF_TableLoader 'Update:BULKAPI','CFG_NMSS_PREPROD','Case_FA_Open_Status_Update'

@@ -65,51 +65,62 @@ ALTER COLUMN ID NVARCHAR(18)
 /******* DBAmp Insert Script *********/
 EXEC SF_TableLoader 'Insert:BULKAPI','CFG_NMSS_PREPROD','FeedItem_T1_LOAD'
 
-SELECT ParentId as CaseID,  
---INTO FeedItem_T1_LOAD_2
+SELECT Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,Body  
+INTO FeedItem_T1_LOAD_2
 FROM FeedItem_T1_LOAD_Result where Error <> 'Operation Successful.'
 
 select count(*), Error from FeedItem_T1_LOAD_2_Result GROUP BY Error
 
 /***** Load Errored Records ******/
-
-SELECT Y.* 
+DROP TABLE FeedItem_Load_Err
+SELECT DISTINCT Y.* 
+INTO FeedItem_Load_Err
 FROM 
 (
 	SELECT X.*,LEN(Body) as BodyLength
-	--INTO FeedItem_Test_2
 	FROM
 	(
 			SELECT
 				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
-				SUBSTRING(TRIM(Body),1,9500) as Body
+				SUBSTRING(TRIM(Body),1,6000) as Body
             
 			FROM
 				FeedItem_T1_LOAD_2
 			UNION ALL
 			SELECT
 				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
-				'Previous Comment Continued...'+CHAR(10)+SUBSTRING(TRIM(Body),9501,9500) as Body
+				'Previous Comment Continued 1...'+CHAR(10)+SUBSTRING(TRIM(Body),6001,6000) as Body
 			FROM
 				FeedItem_T1_LOAD_2
 			UNION ALL
 			SELECT
 				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
-				'Previous Comment Continued...'+CHAR(10)+SUBSTRING(TRIM(Body),19001,9500) as Body
+				'Previous Comment Continued 2...'+CHAR(10)+SUBSTRING(TRIM(Body),12001,6000) as Body
 			FROM
 				FeedItem_T1_LOAD_2
-			--UNION ALL
-			--SELECT
-			--	Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
-			--	'Previous Comment Continued...'+CHAR(10)+SUBSTRING(TRIM(Body),20001,28000) as Body
-			--FROM
-			--	FeedItem_T1_LOAD_2
+			UNION ALL
+			SELECT
+				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+				'Previous Comment Continued 3...'+CHAR(10)+SUBSTRING(TRIM(Body),18001,6000) as Body
+			FROM
+				FeedItem_T1_LOAD_2
 
 			)X
 	)Y
-	WHERE Y.BodyLength > 30
+	WHERE Y.BodyLength > 32
 
+SELECT * FROM FeedItem_Load_Err
+ORDER BY ParentId
 
+	-- Tier 1 Errored Load
+/******* DBAmp Insert Script *********/
+EXEC SF_TableLoader 'Insert:BULKAPI','CFG_NMSS_PREPROD','FeedItem_Load_Err'
+
+select count(*), Error from FeedItem_Load_Err_Result GROUP BY Error
+
+SELECT Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,Body  
+INTO FeedItem_T1_LOAD_5
+FROM FeedItem_Load_Err_3_Result where Error <> 'Operation Successful.'
 
 
 
@@ -134,9 +145,58 @@ select count(*), Error from FeedItem_PType_LOAD_Result GROUP BY Error
 /******* DBAmp Insert Script *********/
 EXEC SF_TableLoader 'Insert:BULKAPI','CFG_NMSS_PREPROD','FeedItem_RType_LOAD'
 
-SELECT * FROM FeedItem_RType_LOAD_Result where Error <> 'Operation Successful.'
+SELECT * 
+INTO FeedItem_RType_LOAD_2
+FROM FeedItem_RType_LOAD_Result where Error <> 'Operation Successful.'
 
 select count(*), Error from FeedItem_RType_LOAD_Result GROUP BY Error
+
+--DROP TABLE FeedItem_RType_Load_Err
+SELECT DISTINCT Y.* 
+INTO FeedItem_RType_Load_Err
+FROM 
+(
+	SELECT X.*,LEN(Body) as BodyLength
+	FROM
+	(
+			SELECT
+				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+				SUBSTRING(TRIM(Body),1,6000) as Body
+            
+			FROM
+				FeedItem_RType_LOAD_2
+			UNION ALL
+			SELECT
+				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+				'Previous Comment Continued 1...'+CHAR(10)+SUBSTRING(TRIM(Body),6001,6000) as Body
+			FROM
+				FeedItem_RType_LOAD_2
+			UNION ALL
+			SELECT
+				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+				'Previous Comment Continued 2...'+CHAR(10)+SUBSTRING(TRIM(Body),12001,6000) as Body
+			FROM
+				FeedItem_RType_LOAD_2
+			UNION ALL
+			SELECT
+				Id,ParentID,CreatedById,CreatedDate,InsertedById,NetworkScope,Status,Type,Visibility,
+				'Previous Comment Continued 3...'+CHAR(10)+SUBSTRING(TRIM(Body),18001,6000) as Body
+			FROM
+				FeedItem_RType_LOAD_2
+
+			)X
+	)Y
+	WHERE Y.BodyLength > 32
+
+SELECT * FROM FeedItem_RType_Load_Err
+ORDER BY ParentId
+
+	-- R Type Errored Load
+/******* DBAmp Insert Script *********/
+EXEC SF_TableLoader 'Insert:BULKAPI','CFG_NMSS_PREPROD','FeedItem_RType_Load_Err'
+
+select * from FeedItem_RType_Load_Err_Result where Error = 'Operation Successful.'
+order by ParentId
 
 
 --====================================================================
@@ -148,7 +208,7 @@ DROP TABLE  FeedItem_DELETE
 DECLARE @_table_server	nvarchar(255)	=	DB_NAME()
 EXECUTE sf_generate 'Delete',@_table_server, ' FeedItem_DELETE'
 
-SELECT ID INTO FeedItem_DELETE FROM FeedItem_LOAD_Result where Error ='Operation Successful.'
+ SELECT ID INTO FeedItem_DELETE FROM FeedItem_RType_Load_Err_Result where Error ='Operation Successful.'
 
 DECLARE @_table_server	nvarchar(255) = DB_NAME()
 EXECUTE	SF_TableLoader
